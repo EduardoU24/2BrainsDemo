@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css"/>
+		<link rel="stylesheet" href="css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="css/style.css"/>
 		<script src="js/angular.js"></script>
 		<script src="js/angular-route.js"></script>
@@ -12,15 +12,58 @@
 		<script src="js/app.js"></script>
 	</head>
 	<body>
-		<div>
-			<h1>2Brains Demo</h1>
-			<div class="description">
-				Entry test 
+		<div id="body">
+			<div id="header">
+				<h1>2Brains Demo</h1>
+				<div class="description">
+					Entry test 
+				</div>
 			</div>
 
-			<div class="content">
-			{{ posts }}
-			</div>
+			<div ng-view></div>
+
+			<!-- MAIN theme, testing purposes -->
+			<script type="text/ng-template" id="main.html">
+
+				<button class="mainbutton" ng-click="getAllPosts()">Get All Posts</button>
+				<button class="mainbutton" ng-click="getFibonacciPosts(10)">Get 10 Fib Posts</button>
+				<button class="mainbutton" ng-click="getFibonacciPostsUntil(50)">Get Fib Posts Until 50</button>
+
+				<div class="content">
+					<input class="form-control postsearcher" ng-model="postsfilter" placeholder="Search" ng-if="posts" />
+					<div class="post" ng-repeat="post in posts | filter:postsfilter as results">
+						<span class="ids">Post ID: {{post.id}} -- UserID: {{post.userId}}</span>
+						<div class="title">{{post.title}}</div>
+						<div class="body">{{post.body}}</div>
+
+						<button ng-if="!post.comments" ng-click="getCommentsFromPost(post.id)">Get Comments</button>
+						<div class="comment" ng-if="post.comments">
+							{{ post.comments }}
+						</div>
+
+						<hr />
+						<span>Raw Data</span>
+						<pre>
+						{{ post }}
+						</pre>
+						<button ng-click="GoToPostDetails(post.id)">Details</button>
+					</div>
+				</div>
+
+			</script>
+			<!-- Post Details theme, testing purposes -->
+			<script type="text/ng-template" id="post.html">
+
+				<div class="content">
+				{{ post }}
+				</div>
+
+						<button ng-if="!post.comments" ng-click="getComments()">Get Comments</button>
+						<div class="comment" ng-if="post.comments">
+							{{ post.comments }}
+						</div>
+
+			</script>
 		</div>
 	</body>
 </html>
