@@ -36,8 +36,8 @@ $ git clone https://github.com/EduardoU24/2BrainsDemo.git
 ### Todo:
 
  - Write MOAR Tests
- -- POST verb, new post.
- -- PUT verb, update post.
+ 	- POST verb, new post.
+ 	- PUT verb, update post.
 
 
 License
