@@ -14,10 +14,7 @@
 	<body>
 		<div id="body">
 			<div id="header">
-				<h1>2Brains Demo</h1>
-				<div class="description">
-					Entry test 
-				</div>
+				<h1>2Brains Test</h1>
 			</div>
 
 			<div ng-view></div>
@@ -25,29 +22,107 @@
 			<!-- MAIN theme, testing purposes -->
 			<script type="text/ng-template" id="main.html">
 
-				<button class="mainbutton" ng-click="getAllPosts()">Get All Posts</button>
-				<button class="mainbutton" ng-click="getFibonacciPosts(10)">Get 10 Fib Posts</button>
-				<button class="mainbutton" ng-click="getFibonacciPostsUntil(50)">Get Fib Posts Until 50</button>
+				<button class="btn btn-default mainbutton" ng-click="getAllPosts()">Get All Posts</button>
+				<button class="btn btn-default mainbutton" ng-click="getFibonacciPosts(10)">Get 10 Fibonacci Posts</button>
+				<button class="btn btn-default mainbutton" ng-click="getFibonacciPostsUntil(100)">Get Fibonacci Posts Until 100</button>
+
+				<div class="row">
+					<div class="col-sm-4">
+						<br />
+						Search post by ID
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="inputdata.searchpostbyid" placeholder="Search post by ID...">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" ng-click="getPostByID(inputdata.searchpostbyid)">Go Fetch!</button>
+							</span>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<br />
+						Search post by Title
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="inputdata.searchpostbytitle" placeholder="Search post by Title...">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" ng-click="getPostByTitle(inputdata.searchpostbytitle)">Go Fetch!</button>
+							</span>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<br />
+						Search comment by post ID
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="inputdata.searchcommentbypostid" placeholder="Search comment by post ID...">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" ng-click="getCommentsByPostID(inputdata.searchcommentbypostid)">Go Fetch!</button>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="resultsmsg" ng-if="results">
+					<hr />
+					Results: 
+				</div>
 
 				<div class="content">
-					<input class="form-control postsearcher" ng-model="postsfilter" placeholder="Search" ng-if="posts" />
-					<div class="post" ng-repeat="post in posts | filter:postsfilter as results">
-						<span class="ids">Post ID: {{post.id}} -- UserID: {{post.userId}}</span>
-						<div class="title">{{post.title}}</div>
-						<div class="body">{{post.body}}</div>
 
-						<button ng-if="!post.comments" ng-click="getCommentsFromPost(post.id)">Get Comments</button>
-						<div class="comment" ng-if="post.comments">
-							{{ post.comments }}
+					<div class="comments" ng-if="comments">
+						<div class="post" ng-repeat="comment in comments">
+							<span class="label label-default">ID: {{comment.id}}</span>
+							<span class="label label-default">Post ID: {{comment.postId}}</span>
+							<br />
+							<br />
+							<span class="label label-info">NAME: </span><br />
+							{{ comment.name }}
+							<br />
+							<br />
+							<span class="label label-info">EMAIL: </span><br />
+							{{ comment.email }}
+							<br />
+							<br />
+							<span class="label label-info">BODY: </span><br />
+							{{ comment.body }}
+						</div>
+					</div>
+
+					<div class="post" ng-repeat="(key, post) in results">
+						<span class="ids">
+							<span class="label label-default">Post ID: {{post.id}}</span>
+							<span class="label label-default">User ID: {{post.userId}}</span>
+						</span>
+						<br />
+						<br />
+						<div class="title">
+							<span class="label label-primary">TITLE:</span><br />{{post.title}}
+						</div>
+						<div class="body">
+							<span class="label label-primary">BODY:</span><br />{{post.body}}
 						</div>
 
-						<hr />
-						<span>Raw Data</span>
-						<pre>
-						{{ post }}
-						</pre>
-						<button ng-click="GoToPostDetails(post.id)">Details</button>
+						<button class="btn btn-default" ng-if="!post.comments" ng-click="getCommentsFromPost(post.id, key)">Get Comments</button>
+
+						<div ng-if="post.comments"><span class="label label-primary">COMMENTS: </span></div>
+						<div class="comments" ng-if="post.comments">
+							<div class="post" ng-repeat="comment in post.comments">
+								<span class="label label-default">ID: {{comment.id}}</span>
+								<br />
+								<br />
+								<span class="label label-info">NAME: </span><br />
+								{{ comment.name }}
+								<br />
+								<br />
+								<span class="label label-info">EMAIL: </span><br />
+								{{ comment.email }}
+								<br />
+								<br />
+								<span class="label label-info">BODY: </span><br />
+								{{ comment.body }}
+							</div>
+						</div>
+
+						<button class="btn btn-default" ng-click="GoToPostDetails(post.id)">View Raw Data</button>
 					</div>
+
 				</div>
 
 			</script>
@@ -55,14 +130,49 @@
 			<script type="text/ng-template" id="post.html">
 
 				<div class="content">
-				{{ post }}
-				</div>
 
-						<button ng-if="!post.comments" ng-click="getComments()">Get Comments</button>
-						<div class="comment" ng-if="post.comments">
-							{{ post.comments }}
+					<pre>
+						{{post}}
+					</pre>
+
+					<hr />
+
+					<span class="ids">
+						<span class="label label-default">Post ID: {{post.id}}</span>
+						<span class="label label-default">User ID: {{post.userId}}</span>
+					</span>
+					<br />
+					<br />
+					<div class="title">
+						<span class="label label-primary">TITLE:</span><br />{{post.title}}
+					</div>
+					<div class="body">
+						<span class="label label-primary">BODY:</span><br />{{post.body}}
+					</div>
+
+					<button class="btn btn-default" ng-if="!post.comments" ng-click="getCommentsFromPost(post.id, key)">Get Comments</button>
+
+					<div ng-if="post.comments"><span class="label label-primary">COMMENTS: </span></div>
+					<div class="comments" ng-if="post.comments">
+						<div class="post" ng-repeat="comment in post.comments">
+							<span class="label label-default">ID: {{comment.id}}</span>
+							<br />
+							<br />
+							<span class="label label-info">NAME: </span><br />
+							{{ comment.name }}
+							<br />
+							<br />
+							<span class="label label-info">EMAIL: </span><br />
+							{{ comment.email }}
+							<br />
+							<br />
+							<span class="label label-info">BODY: </span><br />
+							{{ comment.body }}
 						</div>
+					</div>
 
+					<button class="btn btn-default" ng-click="GoToPostDetails(post.id)">View Raw Data</button>
+				</div>
 			</script>
 		</div>
 	</body>

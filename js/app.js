@@ -19,30 +19,51 @@ angular.module('twobrainsdemo', ['restangular', 'ngRoute'])
 * Logic 
 */
 .controller('MainCtrl', function($scope, Restangular, $location) {
-	//#region PostData
-	$scope.getAllPosts = function() {
-		$scope.posts = Restangular.all('posts').getList().$object;
-		console.log($scope.posts);
-	};
-
-	$scope.getCommentsFromPost = function( id ) {
-		// hardcode TODO: give comment to right post
-		$scope.posts[0].comments = Restangular.all('posts/'+ id +'/comments').getList().$object;
+	$scope.inputdata = {
+		searchpostbyid: '', searchpostbytitle: '', searchcommentbypostid: '', searchcommentbyuser: ''
 	}
 
-	$scope.getFibonacciPosts = function( _num ) {
-		var _sequence = $scope.getFibonacciSequence(_num);
-		console.log("sequence: ", _sequence);
-		$scope.posts = Restangular.all('posts' + _sequence).getList().$object;
+	/** GET POST DATA **/
+	$scope.getAllPosts = function() {
+		$scope.comments = null;
+		$scope.results = Restangular.all('posts').getList().$object;
 	};
 
+	$scope.getPostByID = function( _id ) {
+		if(isNaN(parseInt(_id)))
+			return;
+		$scope.comments = null;
+		$scope.results = [Restangular.one('posts', _id).get().$object];
+	};
+
+	$scope.getPostByTitle = function( _title ) {
+		$scope.comments = null;
+		$scope.results = Restangular.all('posts').getList({title: _title}).$object;
+	};
+
+	/** GET COMMENTS DATA **/
+	$scope.getCommentsByPostID = function( id ) {
+		if(isNaN(parseInt(_id)))
+			return;
+		$scope.results = null;
+		$scope.comments = Restangular.all('posts/'+ id +'/comments').getList().$object;
+	};
+
+	$scope.getCommentsFromPost = function( id, key ) {
+		$scope.comments = null;
+		$scope.results[key].comments = Restangular.all('posts/'+ id +'/comments').getList().$object;
+	};
+
+	/** FIB CALC DATA **/
+	$scope.getFibonacciPosts = function( _num ) {
+		$scope.comments = null;
+		$scope.results = Restangular.all('posts' + $scope.getFibonacciSequence(_num) ).getList().$object;
+	};
 
 	$scope.getFibonacciPostsUntil = function( _num ) {
-		var _sequence = $scope.getFibonacciSequenceUntil(_num);
-		console.log("sequence: ", _sequence);
-		$scope.posts = Restangular.all('posts' + _sequence).getList().$object;
+		$scope.comments = null;
+		$scope.results = Restangular.all('posts' + $scope.getFibonacciSequenceUntil(_num) ).getList().$object;
 	};
-	//#endregion PostData
 
 	// Returns X fibonacci numbers
 	$scope.getFibonacciSequence = function( _num ) {
@@ -61,7 +82,6 @@ angular.module('twobrainsdemo', ['restangular', 'ngRoute'])
 			var fib = $scope.fibonacci(i);
 			if(fib > _num)
 				return $scope.parseFibSequenceForRest(_sequence);
-
 			_sequence.push(fib);
 		}
 		return $scope.parseFibSequenceForRest(_sequence);
@@ -85,11 +105,10 @@ angular.module('twobrainsdemo', ['restangular', 'ngRoute'])
 })
 
 .controller('PostCtrl', function($scope, $routeParams, Restangular) {
-	$scope.post = Restangular.one('posts', $routeParams.id).get().$object;
-	$scope.getComments = function() {
-		// hardcode TODO: give comment to right post
+	Restangular.one("posts", $routeParams.id).get().then(function(post){
+		$scope.post = post;
 		$scope.post.comments = Restangular.all('posts/'+ $scope.post.id +'/comments').getList().$object;
-	}
+	});
 })
 
 ;
