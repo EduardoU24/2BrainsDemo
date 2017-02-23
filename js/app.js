@@ -42,11 +42,11 @@ angular.module('twobrainsdemo', ['restangular', 'ngRoute'])
 	};
 
 	/** GET COMMENTS DATA **/
-	$scope.getCommentsByPostID = function( id ) {
+	$scope.getCommentsByPostID = function( _id ) {
 		if(isNaN(parseInt(_id)))
 			return;
 		$scope.results = null;
-		$scope.comments = Restangular.all('posts/'+ id +'/comments').getList().$object;
+		$scope.comments = Restangular.all('posts/'+ _id +'/comments').getList().$object;
 	};
 
 	$scope.getCommentsFromPost = function( id, key ) {
